@@ -1,18 +1,649 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+	<div class="home">
+		<div class="bg"></div>
+
+		<div v-if="birthdayTipObj.showFlag">
+			<van-notice-bar v-if="birthdayTipObj.days==0" left-icon="volume-o" text="今天是你的生日"/>
+			<van-notice-bar v-else left-icon="volume-o" :text="birthdayTipObj.days+'天后将是你的生日'"/>
+		</div>
+
+		<div class="userInfo">
+			<van-image v-if="userPic!=''" width="50" height="50" round :src="picurl+userPic" />
+			<div v-else class="defaultPic" >
+				<van-icon class="iconfont " class-prefix='icon' name="xiazai4" size="30"  />
+			</div>
+
+			<div class="userInfoDetail">
+				<div class="userName">{{ userName }}</div>
+				<div class="userOther">
+					<div style="margin-right: 5px;">{{ userDep }}</div>
+					<div>{{ userLevel }}</div>
+				</div>
+			</div>
+			<van-button class="logoutBtn" type="info" @click="logout" size="mini">退出登录</van-button>
+		</div>
+
+		
+		<div class="scope">
+			<div class="scopeUnit">
+				<div class="scopeUnitLabel" @click="seeModule('积分详情')">今日积分：</div>
+				<div class="scopeUnitValue">{{ scope.dayIntegral }}</div>
+			</div>
+			<div class="scopeUnit">
+				<div class="scopeUnitLabel" @click="seeModule('部门排名')">部门排名：</div>
+				<div class="scopeUnitValue">{{ scope.departRanking }}</div>
+			</div>
+			<div class="scopeUnit">
+				<div class="scopeUnitLabel" @click="seeModule('部门排名')">班组排名：</div>
+				<div class="scopeUnitValue">{{ scope.teamRanking }}</div>
+			</div>
+		</div>
+
+
+		<div class="modules">
+			<div class="module" @click="seeModule('积分详情')">
+				<div class="moduleIcon" style="background-color: #8079EF;">
+					<van-icon class="iconfont" class-prefix='icon' name="jifen" size="32" color="white" />
+				</div>
+				
+				<div class="moduleLabel">积分详情</div>
+			</div>
+			<div class="module" @click="seeModule('公告信息')">
+				<div class="moduleIcon" style="background-color: #9C15CD;">
+					<van-icon class="iconfont " class-prefix='icon' name="gonggao" size="32" color="white" />
+				</div>
+				
+				<div class="moduleLabel">公告信息</div>
+			</div>
+			<div class="module">
+				<div class="moduleIcon" style="background-color: #2E67B2;" @click="seeModule('目标任务')">
+					<van-icon class="iconfont " class-prefix='icon' name="mubiao" size="28" color="white" />
+				</div>
+				
+				<div class="moduleLabel">目标任务</div>
+			</div>
+		</div>
+
+
+		<div class="messageBlock">
+			<div class="messages" @click="seeMessage('renwu')">
+				<div class="messagesIcon">
+					<van-icon class="iconfont " class-prefix='icon' name="renwu" size="26" color="white" />
+				</div>
+				
+				<div class="messagesRight">
+					<div class="messagesInfo">
+						<div class="messagesInfoLabel">任务消息</div>
+						<!-- <div class="messagesInfoTip">暂未收到工分动态信息</div> -->
+					</div>
+					<van-icon class="messagesRightIcon" name="arrow" color="#999999" />
+				</div>
+			</div>
+
+			<div class="messages" @click="seeMessage('meetings')" >
+				<div class="messagesIcon">
+					<van-icon  name="label-o" size="26" color="white" />
+				</div>
+				<div class="messagesRight">
+					<div class="messagesInfo">
+						<div class="messagesInfoLabel">三会记录</div>
+					</div>
+					<van-icon class="messagesRightIcon" name="arrow" color="#999999" />
+				</div>
+			</div>
+
+			<div class="messages" @click="seeMessage('approvalNotice')" v-if="showApprovalRow">
+				<div class="messagesIcon">
+					<!-- <van-icon class="iconfont " class-prefix='icon' name="xiaoxi" size="26" color="white" /> -->
+					<van-icon name="volume" size="26" color="white" />
+				</div>
+				<div class="messagesRight">
+					<div class="messagesInfo">
+						<div class="messagesInfoLabel">查看审批通知</div>
+					</div>
+					<div class="messagesRightIconWrap">
+						<div class="birthdayNum" v-if="approvalNoticeNum">{{ approvalNoticeNum }}</div>
+						<van-icon class="" name="arrow" color="#999999" />
+					</div>
+				</div>
+			</div>
+
+			<div class="messages" @click="seeMessage('birthday')" v-if="showBirthdayRow">
+				<div class="messagesIcon">
+					<!-- <van-icon class="iconfont " class-prefix='icon' name="xiaoxi" size="26" color="white" /> -->
+					<van-icon name="point-gift" size="26" color="white" />
+				</div>
+				<div class="messagesRight">
+					<div class="messagesInfo">
+						<div class="messagesInfoLabel">近期生日员工</div>
+					</div>
+					<div class="messagesRightIconWrap">
+						<div class="birthdayNum" v-if="birthdayNum">{{ birthdayNum }}</div>
+						<van-icon class="" name="arrow" color="#999999" />
+					</div>
+					
+				</div>
+			</div>
+
+			<!-- <div class="messages" @click="seeMessage('jifen')">
+				<div class="messagesIcon">
+					<van-icon class="iconfont " class-prefix='icon' name="jifen1" size="26" color="white" />
+				</div>
+				<div class="messagesRight">
+					<div class="messagesInfo">
+						<div class="messagesInfoLabel">积分消息</div>
+						<div class="messagesInfoTip">暂未收到工分动态信息</div>
+					</div>
+					<van-icon class="messagesRightIcon" name="arrow" color="#999999" />
+				</div>
+			</div> -->
+			
+			<div class="messages" @click="seeMessage('fujian')">
+				<div class="messagesIcon">
+					<van-icon class="iconfont " class-prefix='icon' name="fujianattachment16" size="26" color="white" />
+				</div>
+				<div class="messagesRight">
+					<div class="messagesInfo">
+						<div class="messagesInfoLabel">附件下载</div>
+					</div>
+					<van-icon class="messagesRightIcon" name="arrow" color="#999999" />
+				</div>
+			</div>
+
+			<div class="messages" @click="seeMessage('gongxunfuli')" >
+				<div class="messagesIcon">
+					<van-icon name="gift" size="26" color="white" />
+				</div>
+				<div class="messagesRight">
+					<div class="messagesInfo">
+						<div class="messagesInfoLabel">功勋福利</div>
+					</div>
+					<van-icon class="messagesRightIcon" name="arrow" color="#999999" />
+				</div>
+			</div>
+
+			<div class="messages" @click="seeMessage('gongsi')" >
+				<div class="messagesIcon">
+					<van-icon class="iconfont " class-prefix='icon' name="xiaoxi" size="26" color="white" />
+				</div>
+				<div class="messagesRight">
+					<div class="messagesInfo">
+						<div class="messagesInfoLabel">公司信息</div>
+					</div>
+					<van-icon class="messagesRightIcon" name="arrow" color="#999999" />
+				</div>
+			</div>			
+
+
+			<div style="margin-bottom: 60px;"></div>
+		</div>
+
+
+		<van-tabbar v-model="active" class="tabbarNav" active-color="#2E67B2" inactive-color="#999999" @change="changeTabbar">
+		  	<van-tabbar-item >
+		  		首页
+		  		<template #icon="props">
+			      	<van-icon class="iconfont" class-prefix='icon' name="shouye" size="26" />
+			    </template>
+		  	</van-tabbar-item>
+		  	<van-tabbar-item >
+		  		积分
+		  		<template #icon="props">
+			      	<van-icon class="iconfont" class-prefix='icon' name="paigongfenpeishebei" size="32" />
+			    </template>
+		  	</van-tabbar-item>
+		  	<van-tabbar-item >
+		  		任务
+		  		<template #icon="props">
+			      	<van-icon class="iconfont" class-prefix='icon' name="renwutongji" size="32" />
+			    </template>
+		  	</van-tabbar-item>
+		  	<van-tabbar-item >
+		  		我的
+		  		<template #icon="props">
+			      	<van-icon class="iconfont" class-prefix='icon' name="xiazai4" size="26" />
+			    </template>
+		  	</van-tabbar-item>
+		</van-tabbar>
+
+	</div>
 </template>
 
-<script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+<script type="text/javascript">
+
+import store from '@/store';
+import { mapState } from 'vuex'
+
+// import url from "@/utils/url.js"
 
 export default {
-  name: 'Home',
-  components: {
-    HelloWorld
-  }
+	name: '',
+	store,
+	data(){
+		return{
+			active: 0,
+
+			// userPic:"https://img.yzcdn.cn/vant/cat.jpeg",
+			// userName:"用户名",
+			// userDep:"财务部",
+			// userLevel:"高级工程师",
+
+			// userPic:"",
+			// userName:"",
+			// userDep:"",
+			// userLevel:"",
+			birthdayTipObj:{},//生日提醒
+			birthdayNum:0,// 近期生日员工数量
+
+			showBirthdayRow:false,
+
+			approvalNoticeNum:0,
+			showApprovalRow:false,
+
+			scope:{},
+
+		}
+	},
+	computed:{
+		...mapState({
+			userPic(state){ return state.userInfo.photo||""},
+			userName(state){ return state.userInfo.name||""},
+			userDep(state){ return state.userInfo.depName||""},
+			userLevel(state){ return state.userInfo.stationLevel||""},
+			birthday(state){ return state.userInfo.birthday||""},
+		})
+	},
+	watch:{},
+	components: {
+		// HelloWorld
+	},
+	methods:{
+		changeTabbar(index){
+			// console.log(index)
+			// if(index==this.active){
+			// 	return
+			// }
+			// console.log(index)
+			switch(index){
+				case 0:
+					this.$router.replace("/")
+					break;
+				case 1:
+					this.$router.replace("/jifenInfo")
+					break;
+				case 2:
+					this.$router.replace("/task")
+					break;
+				case 3:
+					this.$router.replace("/mine")
+					break;
+			}
+		},
+		seeModule(type){
+			switch(type){
+				case "积分详情":
+					this.$router.replace("/jifenInfo")
+					break;
+				case "公告信息":
+					this.$router.push("/notice")
+					break;
+				case "目标任务":
+					this.$router.replace("/task")
+					break;
+
+				case "部门排名":
+					this.$router.push("/rankdep")
+					break;
+			}
+		},
+
+
+		logout(){
+			// 清楚cookie
+
+			// this.cookieTool.remove("jixiao");
+			// this.cookieTool.remove("userId");
+
+			// this.$router.replace("/login")
+
+			var that=this;
+
+			store.dispatch('logout').then(function(){
+				that.$router.replace("/login")
+			})
+
+
+		},
+		seeMessage(type){
+			switch(type){
+				case 'renwu':
+					this.$router.push('/taskMessages');
+					break;
+				case 'jifen':
+					this.$router.push('/jifenMessages');
+					break;
+				case 'gongsi':
+					this.$router.push('/companyInfo');
+					break;
+				case 'fujian':
+					this.$router.push('/fujian');
+					break;
+				case 'birthday':
+					this.$router.push('/birthdayNotice');
+					break;
+				case 'gongxunfuli':
+					this.$router.push('/gongxunfuli');
+					break;
+				case 'approvalNotice':
+					this.$router.push('/approvalNotice');
+					break;
+
+				case 'meetings':
+					this.$router.push('/meetings');
+					break;
+			}
+		},
+		birthdayTip(showDays){
+			var today=new Date(new Date().Format("yyyy-MM-dd"))
+			var birthday=new Date(this.birthday)
+			birthday.setFullYear(today.getFullYear())
+
+			if(birthday<today){
+				birthday.setFullYear(today.getFullYear()+1)
+			}
+			console.log(birthday.Format("yyyy-MM-dd"))
+			console.log(today.Format("yyyy-MM-dd"))
+			var ts=birthday.getTime()-today.getTime()
+			var days=ts/1000/60/60/24
+			console.log(days)
+			var rtn={
+				showFlag:false,
+				days:days
+			}
+			if(days<=showDays){
+				rtn.showFlag=true
+			}
+			return rtn
+		},
+		getBirthdayList(){
+			var that=this;
+			var birthdyNotice_url=this.baseUrl+"/birthdyNotice/get"
+			var axj=this.axios({
+				method: 'get',
+				url: birthdyNotice_url,
+
+			}).then(function(response){
+				console.log(response)
+				if(response.data.code==200){
+					that.showBirthdayRow=true
+					
+				}
+				if(response.data.result){
+					that.birthdayNum=response.data.result.length
+				}
+				
+				
+			})
+		},
+		getApprovalNotice(){
+			var that=this;
+			var approvalNotice_url=this.baseUrl+"/approvalNotice/get"
+			var axj=this.axios({
+				method: 'get',
+				url: approvalNotice_url,
+
+			}).then(function(response){
+				console.log(response)
+				if(response.data.code==200){
+					that.showApprovalRow=true
+					
+				}
+				if(response.data.result){
+					that.approvalNoticeNum=0;
+					for(var s in response.data.result){
+						that.approvalNoticeNum+=response.data.result[s]
+					}
+				}
+				
+			})
+		},
+
+		getRank(){
+			// 获取排名
+			var that=this;
+			var url=this.baseUrl+"/departIntegral/person"
+			var axj=this.axios({
+				method: 'get',
+				url: url,
+
+			}).then(function(response){
+				// console.log(response)
+				that.scope=response.data.result
+			})
+		}
+
+	},
+	mounted(){
+
+	},
+	created(){
+		// 获取员工信息
+		// console.log(JSON.stringify(store.state.userInfo))
+
+		var that=this;
+
+		if(JSON.stringify(store.state.userInfo)=="{}"){
+
+			store.dispatch('getUserInfo').then(function(msg){
+				// nothing
+				console.log(store.state.userInfo)
+				
+
+			}).catch(function(error){
+				that.Toast(error);
+			})
+		}
+		that.birthdayTipObj=that.birthdayTip(2)
+		that.getBirthdayList()
+		
+		this.getApprovalNotice()
+
+		that.getRank()
+		// 获取最新的任务消息
+
+		// 获取最新的积分消息
+	}
+
 }
 </script>
+
+<style type="text/css" >
+	.tabbarNav{
+		padding-bottom: 3px;
+		border-top: 1px solid rgba(0,0,0,0.1);
+		padding-top: 2px;
+	}
+	.van-tabbar{
+		height: 45px;
+	}
+	.van-tabbar-item__icon{
+		margin-bottom: 0px;
+	}
+	.tabbarNav .van-tabbar-item__text{
+		margin-top: auto;
+	}
+
+
+
+	.home{
+		text-align: left;
+	}
+	.home .bg{
+		/*background: url('../assets/img/963.gif');*/
+		background: url('../assets/img/homebg.png');
+		
+		background-repeat: no-repeat;
+		height: 220px;
+		background-size: 100% 100%;
+	}
+
+	.home .defaultPic{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 50%;
+		background-color: white;
+		box-shadow: 0px 0px 6px rgba(0,0,0,0.16);
+		height: 50px;
+		width: 50px;
+	}
+
+	.home .userInfo{
+		width: calc(100% - 30px);
+		margin:0px auto;
+		display: flex;
+		align-items: center;
+		height: 80px;
+	}
+	.home .logoutBtn{
+		margin-left: auto;
+		background-color:#2E67B2;
+		border-color: #2E67B2;
+	}
+	.home .userOther{
+		color: #999999;
+		font-size: 11px;
+		display: flex;
+		align-items: center;
+		margin-top: 10px;
+	}
+	.home .userName{
+		color: #333333;
+		font-size: 14px;
+	}
+	.home .userInfoDetail{
+		margin-left: 10px;
+	}
+
+
+	.home .modules{
+		display: flex;
+		height: 110px;
+		align-items: center;
+		width: calc(100% - 30px);
+		margin:0 auto;
+		justify-content: space-between;
+	}
+	.home .module{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.home .moduleIcon{
+		height: 53px;
+		width: 53px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 13px;
+
+	}
+	.home .moduleLabel{
+		color: #333333;
+		font-size: 18px;
+		margin-top: 10px;
+		text-align: center;
+		font-weight: 500;
+	}
+
+
+
+	.home .messageBlock{
+		width: calc(100% - 30px);
+		margin:0px auto;
+	}
+	.home .messages{
+		display: flex;
+		align-items: center;
+		padding: 5px 0px;
+		height: 60px;
+		box-sizing: border-box;
+	}
+	.home .messagesIcon{
+		background-color: #2E67B2;
+		border-radius: 50%;
+		width: 46px;
+		height: 46px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.home .messagesRight{
+		display: flex;
+		align-items: center;
+		margin-left: 10px;
+		width: calc(100% - 56px);
+		height: 100%;
+		border-bottom: 1px solid rgba(0,0,0,0.1);
+	}
+	.home .messagesInfo{
+		/*height: 100%;*/
+	}
+	.home .messagesInfoLabel{
+		font-size: 16px;
+		color: #333333;
+	}
+	.home .messagesInfoTip{
+		color: #999999;
+		font-size: 12px;
+		margin-top: 6px;
+	}
+	.home .messagesRightIcon{
+		margin-left: auto;
+	}
+	.home .birthdayNum{
+
+		border-radius: 50%;
+		background-color: red;
+		width: 25px;
+		height: 25px;
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-right: 5px;
+	}
+
+	.home .messagesRightIconWrap{
+		margin-left: auto;
+		display: flex;
+		align-items: center;
+	}
+
+	.home .scope{
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+		border-bottom:1px solid rgba(0,0,0,0.08);
+		font-size: 14px;
+	}
+	.home .scopeUnit{
+		box-sizing: border-box;
+		padding: 5px;
+		/*text-align: center;*/
+		border-radius: 5px;
+		/*box-shadow: 0px 0px 5px rgba(0,0,0,0.1);*/
+		display: flex;
+		line-height: 24px;
+		padding-top: 0px;
+	}
+	.home .scopeUnitLabel{
+		/*margin-bottom: 5px;*/
+		/*font-size: 12px;*/
+		color: #333;
+		margin-right: 5px;
+	}
+	.home .scopeUnitValue{
+		color: #999;
+	}
+</style>
