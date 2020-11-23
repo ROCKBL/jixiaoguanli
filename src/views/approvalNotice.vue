@@ -1,9 +1,9 @@
 <template>
 	<div class="approvalNotice">
-		<van-nav-bar title="审批通知"  left-arrow class="pageNavNative" @click-left="onClickLeft" />
+		<van-nav-bar title="审批查看"  left-arrow class="pageNavNative" @click-left="onClickLeft" />
 
 		<div class="messageList">
-			<div class="message" v-for="message in messageList" >
+			<div class="message" v-for="message in messageList" @click="seeInfo(message)">
 				<!-- <div class="messageIcon">
 					<van-icon name="volume" size="26" color="white" />
 				</div>
@@ -47,6 +47,23 @@ export default {
 		onClickLeft(){
             this.$router.go(-1)
         },
+        seeInfo(message){
+
+        	switch(message.name){
+        		case "外出申请":
+        			this.$router.push("/dealOutApply")
+        			break;
+        		case "提案改善建议":
+        			this.$router.push("/dealAdvice")
+        			break;
+        		case "提案改善建议部门评估":
+        			this.$router.push("/dealAdviceDep")
+        			break;
+        		case "文件下载申请":
+        			this.$router.push("/dealDownLoad")
+        			break;
+        	}
+        },
         formatDate(date){
         	var d=new Date(date)
         	return d.Format("yyyy年MM月")
@@ -63,8 +80,15 @@ export default {
 
 			  	that.messageList.length=0
 			  	for(var s in data.result){
+			  		var name=s
+			  		if(s=="提议建议申请"){
+			  			name="提案改善建议"
+			  		}
+			  		if(s=="提议建议部门评估"){
+			  			name="提案改善建议部门评估"
+			  		}
 			  		that.messageList.push({
-			  			name:s,
+			  			name:name,
 			  			num:data.result[s]
 			  		})
 			  	}

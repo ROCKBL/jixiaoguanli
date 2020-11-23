@@ -13,15 +13,16 @@
 		<div v-if="title!='个人级'" class="itemRow" v-for="item in list" @click="seeTask(item)">
 			<div class="itemRowInfo">
 				<div class="itemRowName">{{ item.taskIndicators }}</div>
-				<!-- <div class="itemRowDate">{{ item.createTime }}</div> -->
+				<div class="itemRowDate" v-if="item.totalObjName">{{ item.totalObjName }}</div>
 			</div>
-			<van-icon class="itemRowRight" name="arrow" />
+			<div style="margin-left: auto;">{{ item.startEndTime }}年</div>
+			<van-icon style="margin-left: 10px;" class="itemRowRight" name="arrow" />
 		</div>
 
 		<div v-if="title=='个人级'" class="itemRow" v-for="item in list" @click="seeTask(item)">
 			<div class="itemRowInfo">
 				<div class="itemRowName">{{ formatDate(item.monthChoose) }}任务</div>
-				<!-- <div class="itemRowDate">{{ item.createTime }}</div> -->
+				<div class="itemRowDate">{{ item.totalObjName }}</div>
 			</div>
 			<van-icon class="itemRowRight" name="arrow" />
 		</div>
@@ -46,8 +47,9 @@ export default {
 				// {name:"生产力",date:"2020-08-20 16:40"},
 				// {name:"盈利能力",date:"2020-08-20 16:40"},
 			],
-			title:"公司级"
+			title:"公司级",
 
+			isHigh:store.state.isHigh
 		}
 	},
 	computed:{},
@@ -71,6 +73,12 @@ export default {
         		this.$router.push({ path: '/companyTask', query: { obj: JSON.stringify(item) }})
         	}
         	if(this.title=="部门级"){
+        		// decomposition
+        		// console.log(item)
+        		if(item.decomposition!=1){
+        			this.Toast('该任务没有分解')
+        			return
+        		}
         		this.$router.push({ path: '/depTask', query: { obj: JSON.stringify(item) }})
         	}
 
@@ -124,35 +132,63 @@ export default {
 			
 
 			  		if(that.title=="个人级"){
-			  			var ar=[]
-			  			var objx={}
-			  			for(var i =0;i<data.result.length;i++){
-			  				if(objx[data.result[i].montuh]){
-			  					objx[data.result[i].montuh][data.result[i].aid]=true
+			  			// var ar=[]
+			  			// var objx={}
+			  			// for(var i =0;i<data.result.length;i++){
+			  			// 	if(objx[data.result[i].montuh]){
+			  			// 		objx[data.result[i].montuh][data.result[i].aid]=true
 
-			  				}else{
-			  					objx[data.result[i].montuh]={}
-			  					// objx[data.result[i].montuh].push(objx[data.result[i].])
-			  					objx[data.result[i].montuh][data.result[i].aid]=true
-			  				}
+			  			// 	}else{
+			  			// 		objx[data.result[i].montuh]={}
+			  			// 		// objx[data.result[i].montuh].push(objx[data.result[i].])
+			  			// 		objx[data.result[i].montuh][data.result[i].aid]=true
+			  			// 	}
 
-			  			}
+			  			// }
 
-			  			// console.log(objx)
-			  			for(var m in objx){
-			  				ar.push({
-			  					monthChoose:m,
-			  					con:objx[m]
+			  			// // console.log(objx)
+			  			// for(var m in objx){
+			  			// 	ar.push({
+			  			// 		monthChoose:m,
+			  			// 		con:objx[m]
+			  			// 	})
+			  			// }
+			  			// ar.sort(function(o1,o2){
+			  			// 	console.log(o1.monthChoose)
+
+			  			// 	return (new Date(o2.monthChoose)).getTime()-(new Date(o1.monthChoose)).getTime()
+
+			  			// 	// return o1.monthChoose>o2.monthChoose
+			  			// })
+			  			// that.list=ar
+
+			  			// 处理个人级任务
+			  			var ar=data.result
+			  			var newAr=[]
+			  			ar.map(function(o){
+			  				var find=newAr.find(function(obj){
+			  					return obj.totalObjName==o.totalObjName&&obj.montuh==o.montuh
 			  				})
-			  			}
-			  			ar.sort(function(o1,o2){
-			  				console.log(o1.monthChoose)
+			  				if(find){
+			  					find.group.push(o)
+			  					find.con[o.aid]=true
+			  				}else{
+			  					var newOne={
+			  						group:[o],
+			  						totalObjName:o.totalObjName,
+			  						montuh:o.montuh,
+			  						monthChoose:o.montuh,
+			  						con:{}
+			  					}
+			  					newOne.con[o.aid]=true
+			  					newAr.push(newOne)
+			  				}
+			  			})
+			  			newAr.sort(function(o1,o2){
 
 			  				return (new Date(o2.monthChoose)).getTime()-(new Date(o1.monthChoose)).getTime()
-
-			  				// return o1.monthChoose>o2.monthChoose
 			  			})
-			  			that.list=ar
+			  			that.list=newAr
 			  		}
 			  		
 			  	}else{
@@ -162,7 +198,40 @@ export default {
 
 
 		},
+		isHighLevel(){
+			var that=this;
+			var url=this.baseUrl+"/com/emplyee/checkEmplyeeIdentity";
+			return this.axios({
+				method: 'get',
+				url: url,
+				// params:params
+				params: {
+			      id: store.state.userInfo.id,
+			    }
+			}).then(function(response){
+				var data=response.data
+				if(data.code==200){
+					
+				}else{
+					if(that.title=="公司级"){
+						that.$router.replace({ path: '/', })
+					}
+					
+				}
+			}).catch(function(response){
+				if(that.title=="公司级"){
+					that.$router.replace({ path: '/', })
+				}
+			})
+		},
 
+		jdgeLevel(){
+			if(that.title=="公司级"){
+				if(!that.isHigh){
+					that.$router.replace({ path: '/', })
+				}
+			}
+		}
 
 	},
 	mounted(){
@@ -173,6 +242,33 @@ export default {
 		this.title=title
 
 		this.getTaskList()
+		
+		var that=this;
+		if(JSON.stringify(store.state.userInfo)=="{}"){
+
+			store.dispatch('getUserInfo').then(function(msg){
+				// nothing
+				// that.isHighLevel()
+				if(store.state.isHigh==null){
+					store.dispatch("getUserLevel").then(function(){
+						that.isHigh=store.state.isHigh
+						that.jdgeLevel()
+					})
+				}
+
+			}).catch(function(error){
+				that.Toast(error);
+			})
+		}else{
+			// that.isHighLevel()
+			if(store.state.isHigh==null){
+				store.dispatch("getUserLevel").then(function(){
+					that.isHigh=store.state.isHigh
+					that.jdgeLevel()
+				})
+			}
+		}
+
 
 		// switch(title){
 		// 	case "公司级":
@@ -327,7 +423,7 @@ export default {
 	.taskMid .itemRowDate{
 		color: #999999;
 		font-size: 12px;
-		margin-top: 10px;
+		margin-top: 5px;
 	}
 	.taskMid .itemRowRight{
 		margin-left: auto;

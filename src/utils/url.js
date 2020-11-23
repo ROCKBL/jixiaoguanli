@@ -8,14 +8,21 @@
 
 // const url="http://172.16.16.109:8080"
 
-const url="http://47.114.36.237:8081"
-const picurl="http://47.114.36.237:10080/file/"
+// const url="http://47.114.36.237:8081"
+// const picurl="http://47.114.36.237:10080/file/"
 
 // const url="http://47.114.36.237:8080"
 // const picurl="http://47.114.36.237/file/"
 
-// const url="http://172.16.17.227:8081"
-// const picurl="http://172.16.17.227/file/"
+// const url="http://172.16.16.127:8081"
+// const picurl="http://172.16.16.127:10080/file/"
+
+const url="http://172.16.17.188:8081"
+const picurl="http://172.16.17.188:10080/file/"
+
+
+// const url="http://localhost:8081"
+// const picurl="http://localhost:10080/file/"
 
 
 

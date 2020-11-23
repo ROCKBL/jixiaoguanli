@@ -4,9 +4,11 @@
 
 		<div class="tableWrap" v-if="tableData.length>0">
 			<el-table :data="tableData" style="width: 100%;" :cell-style="{textAlign:'center'}" border header-cell-class-name="tableDataHead">
-		      	<el-table-column prop="score" label="分数" width="100"></el-table-column>
-		      	<el-table-column prop="welfare" label="功勋福利内容" ></el-table-column>
+		      	<el-table-column prop="score" label="分数" width="80"></el-table-column>
+		      	<el-table-column prop="star" label="星级" ></el-table-column>
+		      	<el-table-column prop="welfare" label="福利" ></el-table-column>
 
+		      	<el-table-column v-for="s in addColumn" :prop="s"  :label="s" ></el-table-column>
 		    </el-table>
 		</div>
 		
@@ -28,7 +30,9 @@ export default {
 		return{
 			tableData:[
 
-			]
+			],
+
+			addColumn:[]
 		}
 	},
 	computed:{},
@@ -51,8 +55,22 @@ export default {
 			}).then(function(response) {
 				console.log(response)
 			  	var data=response.data
+			  	if(data.code==200){
+			  		
+			  		that.addColumn=data.result.titles
 
-			  	that.tableData=data.result.records
+			  		that.tableData=data.result.meritoriousWelfareList.map(function(o){
+			  			for(var i=0;i<o.field.length;i++){
+			  				for(var p in o.field[i]){
+			  					o[p]=o.field[i][p]
+			  				}
+			  			}
+			  			return o 
+
+			  		})
+			  	}
+
+			  	
 			  	// console.log(data)
 			  	
 			})
@@ -127,7 +145,7 @@ export default {
 
 
 	.gongxunfuli .tableWrap{
-		width: calc(100% - 50px);
+		width: calc(100% - 30px);
 		margin:auto;
 		margin-top: 20px;
 	}

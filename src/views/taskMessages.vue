@@ -18,6 +18,8 @@
 				</div>
 			</div>
 		</div>
+
+		<van-empty v-if="messageList.length==0" description="没有相关信息" />
 	</div>
 </template>
 

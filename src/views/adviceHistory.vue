@@ -103,7 +103,12 @@ export default {
 		}).then(function(response) {
 		  	var data=response.data
 		  	if(data.code==200){
-		  		console.log(data.result)
+		  		// console.log(data.result)
+		  		data.result.sort(function(a,b){
+		  			var ad=new Date(a.createTime)
+		  			var bd=new Date(b.createTime)
+		  			return bd.getTime()-ad.getTime()
+		  		})
 
 		  		that.applyList=data.result
 		  		

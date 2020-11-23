@@ -407,6 +407,7 @@ export default {
 
 			pgn:1,//分页页码
 
+			yearSetting:[],
 		}
 	},
 	computed:{
@@ -609,113 +610,6 @@ export default {
 	    },
 
 	    refreshData(){
-	  //   	// 刷新页面数据
-	  //   	// this.dateTypeActive
-	  //   	// this.yearMonthDay or others
-	  //   	// this.tyepActive
-	  //   	// var url=this.baseUrl+"/com/scoreCalculation/list";
-	  //   	var url="";
-	  //   	var params={
-	  //   		id:2
-	  //   	};//请求参数
-
-	  //   	var dateTypeAr=["日","月","季","年"];
-	  //   	var currentType=dateTypeAr[this.dateTypeActive]
-	  //   	if(currentType=="日"){
-	  //   		// 处理上传的日期参数
-	  //   		// this.yearMonthDay.date
-	  //   		// url=this.baseUrl+"/statistics/dayIntegral"
-	  //   		url=this.baseUrl+"/statistics/statisticsDayIntegral"
-	  //   		params.date=this.yearMonthDay.date
-	  //   	}
-	  //   	if(currentType=="月"){
-	  //   		// this.yearMonth.date
-	  //   		// url=this.baseUrl+"/statistics/monthIntegral"
-	  //   		url=this.baseUrl+"/statistics/statisticsMonthIntegral"
-	  //   		params.date=this.yearMonth.date
-	  //   	}
-	  //   	if(currentType=="季"){
-	  //   		// url=this.baseUrl+"/statistics/seasonIntegral"
-	  //   		url=this.baseUrl+"/statistics/quarterIntegral"
-	  //   		// 季度特殊处理
-	  //   		var year=this.season.date.substr(0,4);
-	  //   		var season=this.season.date.substr(5,4);
-	  //   		// console.log(year)
-	  //   		// console.log(season)
-	  //   		switch(season){
-	  //   			case '第一季度':
-	  //   				params.year=year
-	  //   				params.quarter=1
-	  //   				break;
-	  //   			case '第二季度':
-	  //   				params.year=year
-	  //   				params.quarter=2
-	  //   				break;
-	  //   			case '第三季度':
-	  //   				params.year=year
-	  //   				params.quarter=3
-	  //   				break;
-	  //   			case '第四季度':
-	  //   				params.year=year
-	  //   				params.quarter=4
-	  //   				break;
-	  //   		}
-	  //   	}
-	  //   	if(currentType=="年"){
-	  //   		// this.year.date
-	  //   		url=this.baseUrl+"/statistics/yearStatistics"
-	  //   		params.year=this.year.date
-	  //   	}
-	    	
-	  //   	// 获取统计总数据
-
-	  //   	// todo
-	  //   	var that=this;
-			
-			// this.axios({
-			// 	method: 'get',
-			// 	url: url,
-			// 	params: params
-			// }).then(function(response) {
-			//   	var data=response.data
-			//   	if(data.code==200){
-			//   		// 获取所有数据
-			//   		// that.allList
-			//   		switch(currentType){
-			//   			case '日':
-			//   				// that.yearMonthDay.a=Anum
-			//   				// that.yearMonthDay.b=Bnum
-			//   				// that.yearMonthDay.total=num
-			//   				break;
-			//   			case '月':
-			//   				// that.yearMonth.a=
-			//   				// that.yearMonth.b=
-			//   				// that.yearMonth.total=
-			//   				break;
-			//   			case '季':
-			//   				// that.season.a=
-			//   				// that.season.b=
-			//   				// that.season.total=
-			//   				break;
-			//   			case '年':
-			//   				// that.year.a=
-			//   				// that.year.b=
-			//   				// that.year.total=
-			//   				break;
-			//   		}
-
-			//   		that.alist=data.result.astatistics
-			//   		that.blist=data.result.bstatistics
-			//   		that.clist=data.result.cstatistics
-			//   		that.dlist=data.result.dstatistics
-
-			//   		that.refreshCardData()
-			//   	}else{
-			//   		// that.Toast('网络错误');
-			  		
-			//   	}
-			// })
-
 			var dateTypeAr=["日","月","季","年","总计"];
 			var currentType=dateTypeAr[this.dateTypeActive];//当前页面类型：日，月。。。
 
@@ -772,6 +666,67 @@ export default {
 	    		this.SDate=date1
 	    		this.EDate=date2
 
+	    		// 判断年份是否在年份设置里
+	    		var find=this.yearSetting.find(function(o){
+					return o.yearTime==Number(year)
+				})
+				if(find){
+					var startTime=new Date(find.startTime).Format("yyyy-MM-dd")
+					var endTime=new Date(find.endTime).Format("yyyy-MM-dd")
+
+					var dealTime=function(date,nmonth){
+						// 获取隔几个月的日期
+						var d=new Date(date)
+						if(d.getMonth()+nmonth>11){
+							d.setFullYear(d.getFullYear()+1)
+							d.setMonth(d.getMonth()+nmonth-12)
+						}else{
+							d.setMonth(d.getMonth()+nmonth)
+						}
+						return d
+						// if(d.getMonth()+nmonth>11){
+						// 	var n1=parseInt((d.getMonth()+nmonth+1)/12)
+
+							
+						// 	d.setFullYear(d.getFullYear()+n1)
+						// }
+						// if(d.getMonth()+nmonth<0){
+
+						// }
+					}
+					switch(season){
+						case '第一季度':
+							this.SDate=startTime
+							var temp=dealTime(startTime,3)
+							temp.setDate(1)
+	    					this.EDate=temp.Format("yyyy-MM-dd")
+							break;
+						case '第二季度':
+							var temp1=dealTime(startTime,3)
+							temp1.setDate(1)
+							var temp2=dealTime(startTime,6)
+							temp2.setDate(1)
+							this.SDate=temp1.Format("yyyy-MM-dd")
+	    					this.EDate=temp2.Format("yyyy-MM-dd")
+							break;
+						case '第三季度':
+							var temp1=dealTime(startTime,6)
+							temp1.setDate(1)
+							var temp2=dealTime(startTime,9)
+							temp2.setDate(1)
+							this.SDate=temp1.Format("yyyy-MM-dd")
+	    					this.EDate=temp2.Format("yyyy-MM-dd")
+							break;
+						case '第四季度':
+							var temp=dealTime(startTime,9)
+							temp.setDate(1)
+
+							this.SDate=temp.Format("yyyy-MM-dd")
+	    					this.EDate=endTime
+							break;
+					}
+				}
+
 				// console.log(this.SDate)
 				// console.log(this.EDate)
 			}
@@ -784,6 +739,15 @@ export default {
 
 				// console.log(this.SDate)
 				// console.log(this.EDate)
+
+				// 判断年份是否在年份设置里
+				var find=this.yearSetting.find(function(o){
+					return o.yearTime==(new Date(that.year.date).getFullYear())
+				})
+				if(find){
+					this.SDate=new Date(find.startTime).Format("yyyy-MM-dd")
+					this.EDate=new Date(find.endTime).Format("yyyy-MM-dd")
+				}
 
 			}
 
@@ -1001,7 +965,26 @@ export default {
 	    	this.Durl=this.baseUrl+"/com/scoreCalculation/getUserD";
 	    	this.TJurl=this.baseUrl+"/statistics/IntegralStatistics";
 
-	    }
+	    },
+	    getYearSetting(){
+	    	// 获取年份设置
+	    	var url=this.baseUrl+"/yearConfig/list"
+	    	var that=this;
+	    	return this.axios({
+				method: 'get',
+				url: url,
+				params:{
+					pageNo:1,
+					pageSize:999999
+				}
+			}).then(function(res){
+				// console.log(res)
+				if(res.data.code==200){
+					that.yearSetting=res.data.result.records
+				}
+			})
+
+	    },
 	},
 	mounted(){
 
@@ -1009,7 +992,10 @@ export default {
 	created(){
 		this.init();
 
-		this.refreshData();
+		var that=this
+		this.getYearSetting().then(function(){
+			that.refreshData();
+		})
 
 	}
 

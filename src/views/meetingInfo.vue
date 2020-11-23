@@ -119,8 +119,11 @@
 				      	<!-- <el-table-column prop="wc" label="完成值/阶段" width="100"></el-table-column> -->
 				      	<el-table-column prop="completionStatus" label="完成情况" width="70">
 				      		<template slot-scope="scope">
-				      			<div v-if="scope.row.completionStatus==1">完成</div>
+				      			<div v-if="scope.row.completionStatus==1">已完成</div>
 				      			<div v-if="scope.row.completionStatus==2">未完成</div>
+				      			<div v-if="scope.row.completionStatus!=1&&scope.row.completionStatus!=2">
+				      				{{ (new Date(scope.row.complteTime).getTime()-new Date().getTime())>0?'':'已过期' }}
+				      			</div>
 				      		</template>
 				      	</el-table-column>
 				      	<el-table-column prop="type" label="奖扣分数类型" width="90"></el-table-column>

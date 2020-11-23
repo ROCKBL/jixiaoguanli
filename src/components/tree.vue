@@ -25,7 +25,7 @@
                         : "超出" +
                           (Number(treeData.complete) - Number(treeData.baseTarget))
                       : 0
-                  }}万
+                  }}万<br>指标：{{ treeData.baseTarget }}万
                   </div>
                   <div class="dataBox">
                     ★: 
@@ -41,7 +41,7 @@
                           (Number(treeData.complete) -
                             Number(treeData.supperTarget))
                       : 0
-                  }}万
+                  }}万<br>指标：{{ treeData.supperTarget }}万
                   </div>
                   <!-- <div class="dataBox">相较☆：{{ treeData.compareBaseTarget }}万</div> -->
                   <!-- <div class="dataBox">相较★：{{ treeData.compareSupperTarget }}万</div> -->
@@ -297,7 +297,7 @@ export default {
           display: flex;
           align-items: center;
           width: 100px;
-          height: 20px;
+          
           border: 1px solid #548235;
           border-radius: 3px;
           font-size: 12px;

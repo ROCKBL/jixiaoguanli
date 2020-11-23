@@ -74,11 +74,11 @@
 				      	<el-table-column prop="hj" label="合计得分" ></el-table-column> -->
 
 				      	<el-table-column prop="taskIndicators" label="任务指标" width="180"></el-table-column>
-				      	<el-table-column prop="planCScore" label="C分预置" width="110"></el-table-column>
+				      	<el-table-column prop="planCScore" label="C分预置" width="70"></el-table-column>
 				      	<el-table-column prop="evaluationCriterion" label="评价标准" ></el-table-column>
 				      	<!-- <el-table-column prop="wc" label="完成值/阶段" width="100"></el-table-column> -->
-				      	<el-table-column prop="integralC" label="单项C分得分" width="90"></el-table-column>
-				      	<el-table-column prop="hj" label="合计得分" ></el-table-column>
+				      	<el-table-column prop="integralC" label="单项C分得分" width="60"></el-table-column>
+				      	<el-table-column prop="hj" label="合计得分" width="80"></el-table-column>
 
 				    </el-table>
 
@@ -262,6 +262,7 @@ export default {
 
         },
         seeRow(row, column, event){
+        	return
         	console.log(row)
         	// console.log(column)
         	// console.log(event)

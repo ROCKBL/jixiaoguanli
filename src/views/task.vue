@@ -2,13 +2,14 @@
 	<div class="task">
 		<van-nav-bar title="任务目标"   class="pageNavNative"  />
 
-		<div class="itemRow" @click="seeMore('公司级')">
+		<div class="itemRow" @click="seeMore('公司级')" v-if="isHigh">
 			<div class="itemRowLeft" style="background-color: #2E67B2;">
 				<van-icon class="iconfont" class-prefix='icon' name="show_gongsiguanli_fill" size="22" />
 			</div>
 			<div class="itemRowLabel">公司级</div>
 			<van-icon class="itemRowRight" name="arrow" />
 		</div>
+
 		<div class="itemRow" @click="seeMore('部门级')">
 			<div class="itemRowLeft" style="background-color: #9C15CD;">
 				<van-icon class="iconfont" class-prefix='icon' name="xiazai4" size="22" />
@@ -64,18 +65,26 @@ import Vue from 'vue'
 import { Toast } from 'vant';
 Vue.use(Toast);
 
+import { mapState } from 'vuex'
+
 export default {
 	name: '',
 	store,
 	data(){
 		return{
 			active: 2,
+			// isHigh:false,
+			isHigh:store.state.isHigh
 		}
 	},
-	computed:{},
+	computed:{
+		...mapState({
+			userInfo(state){ return state.userInfo},
+		})
+	},
 	watch:{},
 	components: {
-
+		
 	},
 	methods:{
 		changeTabbar(index){
@@ -101,6 +110,26 @@ export default {
 		showToast(){
 			Toast('抱歉，职级不够！\n 努力加油，公司发展期待您的共商献策！');
 		},
+
+		isHighLevel(){
+			var that=this;
+			var url=this.baseUrl+"/com/emplyee/checkEmplyeeIdentity";
+			this.axios({
+				method: 'get',
+				url: url,
+				// params:params
+				params: {
+			      id: store.state.userInfo.id,
+			    }
+			}).then(function(response){
+				var data=response.data
+				if(data.code==200){
+					that.isHigh=true
+				}else{
+
+				}
+			})
+		},
 		seeMore(v){
 			//根据接口返回值判断是否进入到下个页面 
 
@@ -111,37 +140,49 @@ export default {
 
 
 			var that=this;
-			var url=this.baseUrl+"/task/targetTask";
-			var params={};
-			params.taskBjectType=v;
+			// var url=this.baseUrl+"/task/targetTask";
+			// var url=this.baseUrl+"/com/emplyee/checkEmplyeeIdentity";
+			// var params={};
+			// params.taskBjectType=v;
 			
-			console.log(params)
-			console.log(url)
-			this.axios({
-				method: 'get',
-				url: url,
-				params:params
-				// params: {
-			 //      id: 1,
-			 //    }
-			}).then(function(response) {
-			  	var data=response.data
-			  	console.log(data)
-			  	if(data.code==200){
-			  		// 判断是否具有权限
-			  		// that.$router.push({ path: '/taskMid', query: { type:v }})
+			// if(this.userInfo.id){
+			// 	return
+			// }
 
-			  		
+			// console.log(this.userInfo)
+			// console.log(store.state.userInfo)
+			// this.axios({
+			// 	method: 'get',
+			// 	url: url,
+			// 	// params:params
+			// 	params: {
+			//       id: store.state.userInfo.id,
+			//     }
+			// }).then(function(response) {
+			//   	var data=response.data
+			//   	console.log(data)
+			//   	if(data.code==200){
+			//   		// 判断是否具有权限
+			//   		// that.$router.push({ path: '/taskMid', query: { type:v }})
+			//   	}else{
+			//   		// that.Toast('网络错误');
+			//   	}
+			// }).catch(function(response){
+			// 	that.showToast();
+			// })
 
 
-			  	}else{
-			  		// that.Toast('网络错误');
-			  	}
-			}).catch(function(response){
-				// that.showToast();
-			})
-
-			this.$router.push({ path: '/taskMid', query: { type:v }})
+			// console.log(v)
+			if(v=="公司级"){
+				if(this.isHigh){
+					this.$router.push({ path: '/taskMid', query: { type:v }})
+				}else{
+					this.showToast()
+				}
+			}else{
+				this.$router.push({ path: '/taskMid', query: { type:v }})
+			}
+			
 
 			// this.showToast();
 		},
@@ -163,7 +204,34 @@ export default {
 	mounted(){
 
 	},
-	created(){}
+	created(){
+		var that=this;
+
+		if(JSON.stringify(store.state.userInfo)=="{}"){
+
+			store.dispatch('getUserInfo').then(function(msg){
+				// nothing
+				// that.isHighLevel()
+				if(store.state.isHigh==null){
+					store.dispatch("getUserLevel").then(function(){
+						that.isHigh=store.state.isHigh
+					})
+				}
+
+
+			}).catch(function(error){
+				that.Toast(error);
+			})
+		}else{
+			// that.isHighLevel()
+			if(store.state.isHigh==null){
+				store.dispatch("getUserLevel").then(function(){
+					that.isHigh=store.state.isHigh
+				})
+			}
+		}
+
+	}
 
 }
 </script>

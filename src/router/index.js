@@ -205,6 +205,92 @@ Vue.use(VueRouter)
     name: 'meetingInfo',
     component: () => import('../views/meetingInfo.vue')
   },
+
+  {
+    // 设置
+    path: '/setting',
+    name: 'setting',
+    component: () => import('../views/setting.vue')
+  },
+  {
+    // 修改密码
+    path: '/changePW',
+    name: 'changePW',
+    component: () => import('../views/changePW.vue')
+  },
+
+  {
+    // 守护者宣言
+    path: '/mydeclaration',
+    name: 'mydeclaration',
+    component: () => import('../views/mydeclaration.vue')
+  },
+  {
+    // 基本制度
+    path: '/myBaseSystem',
+    name: 'myBaseSystem',
+    component: () => import('../views/myBaseSystem.vue')
+  },
+  {
+    // 专项制度
+    path: '/mySpecialSystem',
+    name: 'mySpecialSystem',
+    component: () => import('../views/mySpecialSystem.vue')
+  },
+  {
+    // 外出申请
+    path: '/myOutApply',
+    name: 'myOutApply',
+    component: () => import('../views/myOutApply.vue')
+  },
+  {
+    // 岗位工作标准表
+    path: '/myWorkRule',
+    name: 'myWorkRule',
+    component: () => import('../views/myWorkRule.vue')
+  },
+  {
+    // 我的提案、建议
+    path: '/myAdvice',
+    name: 'myAdvice',
+    component: () => import('../views/myAdvice.vue')
+  },
+
+  {
+    // 个人资料
+    path: '/myInfo',
+    name: 'myInfo',
+    component: () => import('../views/myInfo.vue')
+  },
+
+  {
+    // 外出申请审批
+    path: '/dealOutApply',
+    name: 'dealOutApply',
+    component: () => import('../views/dealOutApply.vue')
+  },
+
+  {
+    // 文件下载申请审批
+    path: '/dealDownLoad',
+    name: 'dealDownLoad',
+    component: () => import('../views/dealDownLoad.vue')
+  },
+
+  {
+    // 提案改善建议
+    path: '/dealAdvice',
+    name: 'dealAdvice',
+    component: () => import('../views/dealAdvice.vue')
+  },
+
+  {
+    // 提案改善建议部门评估
+    path: '/dealAdviceDep',
+    name: 'dealAdviceDep',
+    component: () => import('../views/dealAdviceDep.vue')
+  },
+  
   // {
   //   path: '/about',
   //   name: 'About',

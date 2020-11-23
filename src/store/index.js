@@ -12,7 +12,8 @@ import Cookie from 'js-cookie'
 
 export default new Vuex.Store({
   state: {
-  	userInfo:{}
+  	userInfo:{},
+    isHigh:null,//是否是主管及主管以上级别
   },
   mutations: {
   	setUserInfo(state,obj){
@@ -20,7 +21,15 @@ export default new Vuex.Store({
   	},
   	clearUserInfo(state){
   		state.userInfo={}
-  	}
+  	},
+
+    setIsHigh(state,flag){
+      state.isHigh=flag
+    },
+    clearIsHigh(state){
+      state.isHigh=null
+    },
+
   },
   actions: {
     getUserInfo({ commit, state }){
@@ -45,8 +54,32 @@ export default new Vuex.Store({
                 reject(response)
             })
         })
+    },
 
-        
+    getUserLevel({ commit, state }){
+      return new Promise(function(resolve,reject){
+          var url_user=url+"/com/emplyee/checkEmplyeeIdentity";
+          axios({
+              method: 'get',
+              url: url_user,
+              params: {
+                id: state.userInfo.id,
+              }
+          }).then(function(response) {
+              var data=response.data
+              if(data.code==200){
+
+                  commit('setIsHigh', true)
+                  resolve("ok")
+
+              }else{
+                  commit('setIsHigh', false)
+                  resolve("ok")
+              }
+          }).catch(function(response){
+              reject(response)
+          })
+      })
     },
 
     login({ commit, state },loginData){
@@ -92,6 +125,8 @@ export default new Vuex.Store({
             Cookie.remove("jixiao");
             Cookie.remove("userId");
             commit("clearUserInfo")
+
+            commit("clearIsHigh")
 
             resolve()
             // this.$router.replace("/login")
